@@ -40,6 +40,22 @@ app.post('/api/session/:sid/reset', async (req, res) => {
   res.json({ session: sid, cleared: true });
 });
 
+// Optional: Alias route to support POST /api/clear-session (for convenience)
+app.post('/api/clear-session', async (req, res) => {
+  const { sessionId } = req.body;
+  if (!sessionId) {
+    return res.status(400).json({ error: 'sessionId is required' });
+  }
+  await chatService.clearSession(sessionId);
+  res.json({ session: sessionId, cleared: true });
+});
+
+// app.post('/api/session/:sid/reset', async (req, res) => {
+//   const sid = req.params.sid;
+//   await chatService.clearSession(sid);
+//   res.json({ session: sid, cleared: true });
+// });
+
 // Chat endpoint (REST)
 app.post('/api/chat', async (req, res) => {
   try {
