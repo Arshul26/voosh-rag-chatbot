@@ -1,0 +1,29 @@
+version: '3.9'
+services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+  qdrant:
+    image: qdrant/qdrant
+    ports:
+      - "6333:6333"
+  backend:
+    build: ./backend
+    ports:
+      - "4000:4000"
+    environment:
+      REDIS_URL: redis://redis:6379
+      QDRANT_URL: http://qdrant:6333
+      EMBEDDING_ADAPTER_URL: http://worker:5001/embed
+      LLM_ADAPTER_URL: http://worker:5002/llm
+      SESSION_TTL_SECONDS: 86400
+    depends_on:
+      - redis
+      - qdrant
+      - worker
+  worker:
+    build: ./worker
+    ports:
+      - "5001:5001"
+      - "5002:5002"
