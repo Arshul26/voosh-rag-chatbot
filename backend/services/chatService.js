@@ -1,7 +1,6 @@
+// backend/services/chatService.js
 const { QdrantClient } = require('@qdrant/js-client-rest');
-
 require('dotenv').config();
-
 const axios = require('axios');
 
 class ChatService {
@@ -10,8 +9,8 @@ class ChatService {
     this.io = io;
     this.qdrant = new QdrantClient({
       url: process.env.QDRANT_URL || 'http://localhost:6333',
-      apiKey: process.env.QDRANT_API_KEY, // ✅ Qdrant Cloud API key
-      checkCompatibility: false           // ✅ skip client-server version check warning
+      apiKey: process.env.QDRANT_API_KEY,
+      checkCompatibility: false
     });
     this.collectionName = process.env.QDRANT_COLLECTION || 'news_articles';
     this.embeddingAdapterUrl = process.env.EMBEDDING_ADAPTER_URL || 'http://localhost:5001/embed';
@@ -45,36 +44,62 @@ class ChatService {
     return res?.map(hit => hit.payload?.text || '') || [];
   }
 
-  async handleMessage({ sessionId, message, socket = null }) {
+  // Generates reply and stores user+assistant messages, but DOES NOT emit via socket
+  async generateReplyOnly({ sessionId, message }) {
     const userMsg = { role: 'user', text: message, ts: Date.now() };
     await this.appendToHistory(sessionId, userMsg);
 
-    // Get embedding from adapter
+    // Embedding
     const embResp = await axios.post(this.embeddingAdapterUrl, { text: message });
     const embedding = embResp.data.embedding || (embResp.data.embeddings && embResp.data.embeddings[0]);
 
+    // Retrieve docs
     const docs = await this.retrieveRelevantDocs(embedding, 4);
     const prompt = this.composePrompt(message, docs);
 
+    // Call LLM adapter
     const llmResp = await axios.post(this.llmAdapterUrl, { prompt, stream: false });
     const botText = llmResp.data.text;
 
     const botMsg = { role: 'assistant', text: botText, ts: Date.now(), retrieved: docs };
     await this.appendToHistory(sessionId, botMsg);
 
-    //if (socket) socket.emit('message', { from: 'assistant', text: botText, timestamp: Date.now() });
-    this.io.to(sessionId).emit('message', { from: 'assistant', text: botText, timestamp: Date.now() });
+    // Return the full assistant message object (no emit)
+    return botMsg;
+  }
 
+  // Generates reply and emits via socket (used for WebSocket flow)
+  async handleMessage({ sessionId, message, socket = null }) {
+    // reuse generateReplyOnly to do the heavy lifting (history + LLM)
+    const botMsg = await this.generateReplyOnly({ sessionId, message });
+
+    // Build payload for socket
+    const payload = {
+      from: 'assistant',
+      text: botMsg.text,
+      timestamp: Date.now(),
+      retrieved: botMsg.retrieved || []
+    };
+
+    // Emit only once: either directly to the calling socket or broadcast to the room
+    if (socket) {
+      socket.emit('message', payload); // to the connected socket only
+    } else {
+      this.io.to(sessionId).emit('message', payload); // broadcast to the session room
+    }
+
+    // return the assistant message object for callers
     return botMsg;
   }
 
   composePrompt(query, docs) {
     const system = `You are a helpful assistant that answers user queries using the provided news passages. If nothing in the passages answers the question, say "I don't know".`;
-    const passages = docs.map((d, i) => `Passage ${i+1}:\n${d}`).join('\n\n');
+    const passages = docs.map((d, i) => `Passage ${i + 1}:\n${d}`).join('\n\n');
     return `${system}\n\nUser question: ${query}\n\nNews passages:\n${passages}\n\nAnswer:`;
   }
 }
 
 module.exports = ChatService;
+
 
 

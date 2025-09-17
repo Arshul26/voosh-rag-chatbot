@@ -50,44 +50,16 @@ app.post('/api/clear-session', async (req, res) => {
   res.json({ session: sessionId, cleared: true });
 });
 
-// app.post('/api/session/:sid/reset', async (req, res) => {
-//   const sid = req.params.sid;
-//   await chatService.clearSession(sid);
-//   res.json({ session: sid, cleared: true });
-// });
-
 // Chat endpoint (REST)
 app.post('/api/chat', async (req, res) => {
   try {
     const { sessionId, message } = req.body;
-    const reply = await chatService.handleMessage({ sessionId, message });
-    res.json(reply);
+    // Use generateReplyOnly so REST returns reply but server does NOT emit it via socket
+    const reply = await chatService.generateReplyOnly({ sessionId, message });
+    res.json(reply); // returns the assistant message object
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// WebSocket events
-io.on('connection', socket => {
-  console.log('socket connected', socket.id);
-
-  socket.on('join', ({ sessionId }) => {
-    socket.join(sessionId);
-  });
-
-  socket.on('message', async ({ sessionId, message }) => {
-    try {
-      io.to(sessionId).emit('message', { from: 'user', text: message, timestamp: Date.now() });
-      await chatService.handleMessage({ sessionId, message, socket });
-    } catch (e) {
-      console.error(e);
-      socket.emit('error', { error: e.message });
-    }
-  });
-
-  socket.on('disconnect', () => console.log('socket disconnected', socket.id));
-});
-
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => console.log(`Backend listening on ${PORT}`));
