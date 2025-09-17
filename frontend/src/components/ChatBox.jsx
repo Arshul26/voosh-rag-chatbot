@@ -19,7 +19,7 @@ export default function ChatBox() {
     fetchSessionHistory(sessionId).then(setMessages);
 
     socket.on('message', (msg) => {
-      // 👇 Skip assistant messages from socket to avoid duplicate replies
+      // Skip assistant messages from socket to avoid duplicate replies
       if (msg.from === 'assistant') return;
 
       setMessages((prev) => {

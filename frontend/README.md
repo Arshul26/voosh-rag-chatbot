@@ -21,8 +21,8 @@ Built with **React + TailwindCSS**, it provides a clean UI for interacting with 
 ## ⚙️ Setup & Installation
 ```bash
 # Clone the repo
-git clone <your-repo-url>
-cd <frontend-folder>
+git clone https://github.com/Arshul26/voosh-rag-chatbot.git
+cd frontend
 
 # Install dependencies
 npm install
