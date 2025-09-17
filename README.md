@@ -14,10 +14,10 @@ The system follows a Retrieval-Augmented Generation (RAG) pipeline to fetch rele
 ---
 
 # 1️⃣ Start Worker Services (in the background)
-# Navigate to the worker folder
+- **Navigate to the worker folder**
+```bash
 cd worker
 venv\Scripts\Activate
-
 # Read the worker README carefully.
 
 # Start the Embedding Adapter in the background
@@ -25,9 +25,10 @@ python adapter.py
 
 # Start the LLM Adapter in the foreground
 python llm_adapter.py
-
+```
 # 2️⃣ Start Backend (in the background)
-# Navigate to the backend folder
+- **Navigate to the backend folder**
+```bash
 cd backend
 
 # Read the backend README for environment variable setup.
@@ -35,9 +36,10 @@ cd backend
 # Install dependencies and run
 npm install
 npm run dev
-
+```
 # 3️⃣ Start Frontend (in the foreground)
-# Navigate to the frontend folder
+- **Navigate to the frontend folder**
+```bash
 cd frontend
 
 # Read the frontend README.
@@ -45,3 +47,4 @@ cd frontend
 # Install dependencies and run
 npm install
 npm start
+```

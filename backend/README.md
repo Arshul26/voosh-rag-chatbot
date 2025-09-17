@@ -21,7 +21,7 @@ It handles chat sessions, embeddings, document retrieval, and communication with
 
 ### 1. Clone the repository
 ```bash
-git clone <your-backend-repo-url>
+git clone https://github.com/Arshul26/voosh-rag-chatbot.git
 cd backend
 ```
 ---
