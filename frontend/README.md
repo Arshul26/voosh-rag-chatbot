@@ -1,12 +1,33 @@
-# React + Vite
+# Voosh RAG Chatbot - Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This is the **frontend** for the Voosh RAG (Retrieval-Augmented Generation) chatbot.  
+Built with **React + TailwindCSS**, it provides a clean UI for interacting with the backend, fetching relevant news documents, and displaying LLM-powered responses.
 
-Currently, two official plugins are available:
+## 🚀 Features
+- **Real-time Chat**: Send messages and receive assistant responses instantly.
+- **Socket.io Integration**: Join a session room and get messages in real-time.
+- **Message History**: Loads previous chat history for the session.
+- **Typing Indicator**: Shows when assistant is generating a response.
+- **Duplicate Prevention**: Ensures no repeated assistant messages.
+- **Responsive UI**: Optimized for different screen sizes with smooth scrolling.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tech Stack
+- **React** (Vite/CRA)
+- **Tailwind CSS** for styling
+- **Socket.io Client** for real-time communication
+- **Axios** for API requests
 
-## Expanding the ESLint configuration
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## ⚙️ Setup & Installation
+```bash
+# Clone the repo
+git clone <your-repo-url>
+cd <frontend-folder>
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+
