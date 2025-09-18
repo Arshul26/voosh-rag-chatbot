@@ -46,5 +46,9 @@ cd frontend
 
 # Install dependencies and run
 npm install
-npm start
+npm run dev
 ```
+
+## 📸 Chatbot Screenshot
+
+![Chatbot Screenshot](./frontend/src/assets/Chatbot_Demo.png)
